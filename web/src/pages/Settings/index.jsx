@@ -805,6 +805,26 @@ export function Settings() {
               />
             </InputGroupField>
             {pressureAvailable.value && (
+              <InputGroupField
+                label='Pressure Offset (bar)'
+                htmlFor='pressureOffset'
+                unit='bar'
+                unitAriaLabel='bar'
+                helpText='If your machine has a grouphead mushroom valve enter its cracking pressure here. Delonghi machines are often 4.0. If you have a 3-way solenoid valve this should be left at 0.0'
+              >
+                <input
+                  id='pressureOffset'
+                  name='pressureOffset'
+                  type='number'
+                  step='any'
+                  className='grow'
+                  placeholder='0.0'
+                  value={formData.pressureOffset}
+                  onChange={onChange('pressureOffset')}
+                />
+              </InputGroupField>
+            )}
+            {pressureAvailable.value && (
               <SettingsFormField
                 label='Pressure Sensor Rating'
                 htmlFor='pressureScaling'
