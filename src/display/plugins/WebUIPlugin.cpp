@@ -559,6 +559,7 @@ void WebUIPlugin::handleSettings(AsyncWebServerRequest *request) const {
             if (request->hasArg("altRelayFunction"))
                 settings->setAltRelayFunction(request->arg("altRelayFunction").toInt());
             settings->setAutoWakeupEnabled(request->hasArg("autowakeupEnabled"));
+            settings->setDeveloperMode(request->hasArg("developerMode"));
             if (request->hasArg("autowakeupSchedules")) {
                 // Handle schedule format with days
                 String schedulesStr = request->arg("autowakeupSchedules");
@@ -657,6 +658,7 @@ void WebUIPlugin::handleSettings(AsyncWebServerRequest *request) const {
     doc["altRelayFunction"] = settings.getAltRelayFunction();
     // Add auto-wakeup settings to response
     doc["autowakeupEnabled"] = settings.isAutoWakeupEnabled();
+    doc["developerMode"] = settings.isDeveloperMode();
 
     // Add schedule format with days
     std::vector<AutoWakeupSchedule> autowakeupSchedules = settings.getAutoWakeupSchedules();
@@ -813,6 +815,7 @@ void WebUIPlugin::updateOTAStatus(const String &version) {
     doc["latestVersion"] = ota->getCurrentVersion();
     doc["channel"] = settings.getOTAChannel();
     doc["updating"] = updating;
+    doc["developerMode"] = settings.isDeveloperMode();
     // SPIFFS usage metrics
     {
         size_t total = SPIFFS.totalBytes();
