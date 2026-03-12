@@ -93,7 +93,7 @@ void ShotHistoryPlugin::setup(Controller *c, PluginManager *pm) {
 void ShotHistoryPlugin::record() {
     bool shouldRecord = recording || extendedRecording;
 
-    if (shouldRecord && (controller->getMode() == MODE_BREW || extendedRecording)) {
+    if (shouldRecord && (controller->getMode() == MODE_BREW || controller->getMode() == MODE_MENU || extendedRecording)) {
         if (!isFileOpen) {
             if (!fs->exists("/h")) {
                 fs->mkdir("/h");

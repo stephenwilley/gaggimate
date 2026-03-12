@@ -410,6 +410,8 @@ float Controller::getTargetTemp() const {
         return settings.getTargetSteamTemp();
     case MODE_WATER:
         return settings.getTargetWaterTemp();
+    case MODE_MENU:
+    case MODE_STANDBY:
     default:
         return 0;
     }
@@ -428,6 +430,8 @@ void Controller::setTargetTemp(float temperature) {
     case MODE_WATER:
         settings.setTargetWaterTemp(static_cast<int>(temperature));
         break;
+    case MODE_MENU:
+    case MODE_STANDBY:
     default:;
     }
     updateLastAction();
@@ -652,7 +656,7 @@ void Controller::activateStandby() {
 
 void Controller::deactivateStandby() {
     deactivate();
-    setMode(MODE_BREW);
+    setMode(MODE_MENU);
 }
 
 bool Controller::isActive() const {
@@ -740,6 +744,7 @@ void Controller::handleBrewButton(int brewButtonStatus) {
     if (brewButtonStatus) {
         switch (getMode()) {
         case MODE_STANDBY:
+        case MODE_MENU:
             deactivateStandby();
             break;
         case MODE_BREW:
@@ -762,7 +767,7 @@ void Controller::handleBrewButton(int brewButtonStatus) {
             break;
         }
     } else if (!settings.isMomentaryButtons()) {
-        if (getMode() == MODE_BREW) {
+        if (getMode() == MODE_BREW || getMode() == MODE_MENU) {
             if (isActive()) {
                 deactivate();
                 clear();
@@ -780,6 +785,7 @@ void Controller::handleSteamButton(int steamButtonStatus) {
     if (steamButtonStatus) {
         switch (getMode()) {
         case MODE_STANDBY:
+        case MODE_MENU:
             setMode(MODE_STEAM);
             break;
         case MODE_BREW:

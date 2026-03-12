@@ -134,7 +134,7 @@ class Controller {
     PluginManager *pluginManager{};
     ProfileManager *profileManager{};
 
-    int mode = MODE_BREW;
+    int mode = MODE_MENU;
     float currentTemp = 0;
     float pressure = 0.0f;
     float targetPressure = 0.0f;

@@ -138,6 +138,9 @@ void DefaultUI::init() {
         case MODE_WATER:
             changeScreen(&ui_SimpleProcessScreen, &ui_SimpleProcessScreen_screen_init);
             break;
+        case MODE_MENU:
+            changeScreen(&ui_MenuScreen, &ui_MenuScreen_screen_init);
+            break;
         default:
             break;
         };

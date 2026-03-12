@@ -49,9 +49,9 @@ void onSteamScreen(lv_event_t *e) {
 }
 
 void onWakeup(lv_event_t *e) {
-    controller.getUI()->changeScreen(&ui_BrewScreen, &ui_BrewScreen_screen_init);
     controller.deactivate();
-    controller.setMode(MODE_BREW);
+    controller.setMode(MODE_MENU);
+    controller.getUI()->changeScreen(&ui_MenuScreen, &ui_MenuScreen_screen_init);
 }
 
 void onLoadStarted(lv_event_t *e) {}
@@ -66,7 +66,7 @@ void onGrindTimeRaise(lv_event_t *e) { controller.raiseGrindTarget(); }
 
 void onMenuClick(lv_event_t *e) {
     controller.deactivate();
-    controller.setMode(MODE_BREW);
+    controller.setMode(MODE_MENU);
     controller.getUI()->changeScreen(&ui_MenuScreen, &ui_MenuScreen_screen_init);
 }
 
