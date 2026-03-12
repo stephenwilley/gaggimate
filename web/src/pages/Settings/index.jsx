@@ -184,6 +184,9 @@ export function Settings() {
       if (key === 'autowakeupEnabled') {
         value = !formData.autowakeupEnabled;
       }
+      if (key === 'developerMode') {
+        value = !formData.developerMode;
+      }
       if (key === 'standbyDisplayEnabled') {
         value = !formData.standbyDisplayEnabled;
         // Set standby brightness to 0 when toggle is off
@@ -490,7 +493,6 @@ export function Settings() {
               checked={!!formData.clock24hFormat}
               onChange={onChange('clock24hFormat')}
             />
-          </Card>
 
           {/* Display Settings */}
           <Card sm={10} lg={5} title='Display Settings'>
@@ -727,6 +729,14 @@ export function Settings() {
                 ))}
               </select>
             </SettingsFormField>
+            <div className='divider'>Developer</div>
+            <ToggleField
+              label='Developer Mode'
+              htmlFor='developerMode'
+              checked={!!formData.developerMode}
+              onChange={onChange('developerMode')}
+              helpText='Enables manual firmware uploads. Use with caution to avoid bricking.'
+            />
           </Card>
 
           {/* Machine Settings */}
