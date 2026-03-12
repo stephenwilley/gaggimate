@@ -120,6 +120,7 @@ class Settings {
     int getFullTankDistance() const { return fullTankDistance; }
     int getAltRelayFunction() const { return altRelayFunction; }
     bool isAutoWakeupEnabled() const { return autowakeupEnabled; }
+    bool isDeveloperMode() const { return developerMode; }
     std::vector<AutoWakeupSchedule> getAutoWakeupSchedules() const { return autowakeupSchedules; }
     String getButtonBehavior(int index) const {
         if (index >= 0 && index < buttonBehavior.size())
@@ -194,6 +195,7 @@ class Settings {
     void setFullTankDistance(int full_tank_distance);
     void setAltRelayFunction(int alt_relay_function);
     void setAutoWakeupEnabled(bool enabled);
+    void setDeveloperMode(bool enabled);
     void setAutoWakeupSchedules(const std::vector<AutoWakeupSchedule> &schedules);
     void setButtonBehavior(int index, String behavior);
     void setButtonBehaviorList(const std::vector<String> &behavior_list);
@@ -270,6 +272,7 @@ class Settings {
     int fullTankDistance = 50;
     int altRelayFunction = ALT_RELAY_GRIND; // Default to grind
     std::vector<String> buttonBehavior;
+    bool developerMode = false;
 
     void doSave();
     xTaskHandle taskHandle;

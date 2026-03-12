@@ -51,6 +51,7 @@ Settings::Settings() {
     steamPumpCutoff = preferences.getFloat("spc", DEFAULT_STEAM_PUMP_CUTOFF);
     historyIndex = preferences.getInt("hi", 0);
     autowakeupEnabled = preferences.getBool("ab_en", false);
+    developerMode = preferences.getBool("dev_m", false);
 
     // Load schedule format: "time1|days1;time2|days2" where days is 7-bit string (e.g., "1111100" for weekdays only)
     String schedulesStr = preferences.getString("ab_schedules", "");
@@ -457,6 +458,11 @@ void Settings::setAutoWakeupEnabled(bool enabled) {
     save();
 }
 
+void Settings::setDeveloperMode(bool enabled) {
+    developerMode = enabled;
+    save();
+}
+
 void Settings::setAutoWakeupSchedules(const std::vector<AutoWakeupSchedule> &schedules) {
     autowakeupSchedules = schedules;
     save();
@@ -527,6 +533,7 @@ void Settings::doSave() {
     preferences.putFloat("spc", steamPumpCutoff);
     preferences.putInt("hi", historyIndex);
     preferences.putBool("ab_en", autowakeupEnabled);
+    preferences.putBool("dev_m", developerMode);
 
     // Save schedule format
     String schedulesForSave = "";
