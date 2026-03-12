@@ -88,6 +88,8 @@ class WebUIPlugin : public Plugin {
     // stall mid-asset-serve). Keeping one doc lets its underlying pool grow
     // once and stay put.
     JsonDocument statusDoc{&psramAllocator};
+    int lastOtaProgress = -1;
+    uint8_t lastOtaPhase = 0;
 };
 
 #endif // WEBUIPLUGIN_H
