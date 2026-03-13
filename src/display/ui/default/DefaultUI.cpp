@@ -66,10 +66,25 @@ void DefaultUI::updateTempStableFlag() {
 
 void DefaultUI::adjustHeatingIndicator(lv_obj_t *dials) {
     lv_obj_t *heatingIcon = ui_comp_get_child(dials, UI_COMP_DIALS_TEMPICON);
-    lv_obj_set_style_img_recolor(heatingIcon, lv_color_hex(isTemperatureStable ? 0x00D100 : 0xF62C2C),
-                                 LV_PART_MAIN | LV_STATE_DEFAULT);
-    if (!isTemperatureStable) {
+
+    uint32_t color = 0xFAFAFA; // Default to White (Off/Cold)
+    bool flashing = false;
+
+    if (isTemperatureStable && targetTemp > 0) {
+        color = 0x00D100; // Green (Ready)
+    } else if (currentTemp < targetTemp) {
+        color = 0xF62C2C; // Red (Active Heating)
+        flashing = true;
+    } else if (currentTemp >= 40) {
+        color = 0xFF7F00; // Orange (Cooling / Hot)
+    }
+
+    lv_obj_set_style_img_recolor(heatingIcon, lv_color_hex(color), LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    if (flashing) {
         lv_obj_set_style_opa(heatingIcon, heatingFlash ? LV_OPA_50 : LV_OPA_100, LV_PART_MAIN | LV_STATE_DEFAULT);
+    } else {
+        lv_obj_set_style_opa(heatingIcon, LV_OPA_100, LV_PART_MAIN | LV_STATE_DEFAULT);
     }
 }
 
