@@ -1,8 +1,8 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDroplet } from '@fortawesome/free-solid-svg-icons/faDroplet';
 import { faMugHot } from '@fortawesome/free-solid-svg-icons/faMugHot';
+import { faScaleBalanced } from '@fortawesome/free-solid-svg-icons/faScaleBalanced';
 import { faStopwatch } from '@fortawesome/free-solid-svg-icons/faStopwatch';
-import { faWeightScale } from '@fortawesome/free-solid-svg-icons/faWeightScale';
 
 // Presentational only: renders a high-signal summary layer from StatisticsService.summary.
 function formatDuration(seconds) {
@@ -50,12 +50,12 @@ function SummaryStatCard({ icon, label, value, accentColorVar, tone = 'muted' })
 
         <div className='min-w-0 flex-1 text-center'>
           <div
-            className='truncate text-xl font-bold leading-tight sm:text-2xl'
+            className='truncate text-xl leading-tight font-bold sm:text-2xl'
             style={{ color: isStrong ? accent : 'inherit' }}
           >
             {value}
           </div>
-          <div className='mt-1 text-[10px] font-semibold uppercase tracking-wide opacity-60 sm:text-[11px]'>
+          <div className='mt-1 text-[10px] font-semibold tracking-wide uppercase opacity-60 sm:text-[11px]'>
             {label}
           </div>
         </div>
@@ -81,7 +81,7 @@ export function SummaryCards({ summary }) {
       key: 'totalWeight',
       label: 'Total Weight',
       value: `${fmtNumber(summary.totalWeight)}g`,
-      icon: faWeightScale,
+      icon: faScaleBalanced,
       accentColorVar: '--analyzer-weight-text',
       tone: 'strong',
     },
@@ -105,7 +105,9 @@ export function SummaryCards({ summary }) {
 
   return (
     <div className='space-y-2'>
-      <div className='px-1 text-[10px] font-semibold uppercase tracking-wide opacity-50'>Totals</div>
+      <div className='px-1 text-[10px] font-semibold tracking-wide uppercase opacity-50'>
+        Totals
+      </div>
       <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4'>
         {totalCards.map(card => (
           <SummaryStatCard key={card.key} {...card} />

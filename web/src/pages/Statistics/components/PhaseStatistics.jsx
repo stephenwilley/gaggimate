@@ -9,7 +9,9 @@ const EXIT_REASON_UNKNOWN_STYLE = {
 };
 
 function getExitReasonAccent(reason) {
-  const normalized = String(reason || '').trim().toLowerCase();
+  const normalized = String(reason || '')
+    .trim()
+    .toLowerCase();
   if (!normalized) return null;
   if (normalized.includes('weight')) return 'var(--analyzer-weight-text)';
   if (normalized.includes('flow')) return 'var(--analyzer-flow-text)';
@@ -42,7 +44,8 @@ function TargetDeltaCell({ entry, unit }) {
   if (!entry) return <td className='text-right font-mono'>-</td>;
   return (
     <td className='text-right font-mono' style={{ color: DELTA_COLOR }}>
-      {fmt(entry.target)}{unit} ({fmtDelta(entry.delta)})
+      {fmt(entry.target)}
+      {unit} ({fmtDelta(entry.delta)})
     </td>
   );
 }
@@ -97,10 +100,14 @@ function PhaseSection({ phase }) {
               <thead>
                 <tr className='text-xs opacity-60'>
                   <th>Metric</th>
-                  <th className='text-right' title='Time-Weighted Average'>Avg (TW)</th>
+                  <th className='text-right' title='Time-Weighted Average'>
+                    Avg (TW)
+                  </th>
                   <th className='text-right'>Min</th>
                   <th className='text-right'>Max</th>
-                  <th className='text-right' title='Average target value and deviation'>Target (Delta)</th>
+                  <th className='text-right' title='Average target value and deviation'>
+                    Target (Delta)
+                  </th>
                 </tr>
               </thead>
               <tbody>

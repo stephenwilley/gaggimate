@@ -18,6 +18,8 @@ export const ANALYZER_DB_KEYS = {
   PROFILES: 'gaggimate_profiles',
   PRESETS: 'gaggimate_column_presets',
   USER_STANDARD: 'gaggimate_user_standard_cols',
+  LIBRARY_SHOTS_SOURCE_FILTER: 'gaggimate_library_shots_source_filter',
+  LIBRARY_PROFILES_SOURCE_FILTER: 'gaggimate_library_profiles_source_filter',
 };
 
 /**
@@ -356,14 +358,12 @@ export const notesTasteStyles = {
   bitter: {
     color: analyzerUiColors.notesTasteBitter,
     borderColor: analyzerUiColors.notesTasteBitter,
-    selectedBackground:
-      'color-mix(in srgb, var(--analyzer-notes-taste-bitter) 12%, transparent)',
+    selectedBackground: 'color-mix(in srgb, var(--analyzer-notes-taste-bitter) 12%, transparent)',
   },
   balanced: {
     color: analyzerUiColors.notesTasteBalanced,
     borderColor: analyzerUiColors.notesTasteBalanced,
-    selectedBackground:
-      'color-mix(in srgb, var(--analyzer-notes-taste-balanced) 12%, transparent)',
+    selectedBackground: 'color-mix(in srgb, var(--analyzer-notes-taste-balanced) 12%, transparent)',
   },
   sour: {
     color: analyzerUiColors.notesTasteSour,

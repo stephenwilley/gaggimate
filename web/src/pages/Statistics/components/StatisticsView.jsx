@@ -123,7 +123,9 @@ function formatShotDateTime(ms) {
 }
 
 function getShotDisplayPrimary(shotMeta) {
-  return String(shotMeta?.name || shotMeta?.label || shotMeta?.title || shotMeta?.id || 'Unknown Shot');
+  return String(
+    shotMeta?.name || shotMeta?.label || shotMeta?.title || shotMeta?.id || 'Unknown Shot',
+  );
 }
 
 function stripFileExtension(value) {
@@ -343,7 +345,9 @@ export function StatisticsView({ initialContext }) {
         : next;
     });
 
-    const validShotKeys = new Set((rawShotCandidates || []).map(getShotSelectionKey).filter(Boolean));
+    const validShotKeys = new Set(
+      (rawShotCandidates || []).map(getShotSelectionKey).filter(Boolean),
+    );
     setSelectedShotKeys(prev => {
       const next = prev.filter(id => validShotKeys.has(id));
       return next.length === prev.length && next.every((value, index) => value === prev[index])
@@ -385,7 +389,14 @@ export function StatisticsView({ initialContext }) {
     }, 450);
 
     return () => clearTimeout(timer);
-  }, [source, initialProfileName, metadataLoaded, metadataLoading, metadataError, availableProfiles]);
+  }, [
+    source,
+    initialProfileName,
+    metadataLoaded,
+    metadataLoading,
+    metadataError,
+    availableProfiles,
+  ]);
 
   const parsedDslQuery = useMemo(() => parseStatisticsQuery(query), [query]);
 
@@ -454,13 +465,7 @@ export function StatisticsView({ initialContext }) {
       parseErrors,
       parseWarnings,
     };
-  }, [
-    compiledDslFilter,
-    dateBasisMode,
-    rawShotCandidates,
-    visualDateFrom,
-    visualDateTo,
-  ]);
+  }, [compiledDslFilter, dateBasisMode, rawShotCandidates, visualDateFrom, visualDateTo]);
 
   const hasBaseParseErrors = baseFilterState.parseErrors.length > 0;
   const selectionScopeShots = useMemo(
@@ -518,12 +523,18 @@ export function StatisticsView({ initialContext }) {
   );
 
   const baseShotSelectionItems = useMemo(
-    () => (selectionScopeShots || []).map(shot => buildShotSelectionItem(shot, dateBasisMode)).filter(item => item.id),
+    () =>
+      (selectionScopeShots || [])
+        .map(shot => buildShotSelectionItem(shot, dateBasisMode))
+        .filter(item => item.id),
     [selectionScopeShots, dateBasisMode],
   );
 
   const selectedProfileNormalizedSet = useMemo(
-    () => new Set((selectedProfileNames || []).map(name => cleanName(name).toLowerCase()).filter(Boolean)),
+    () =>
+      new Set(
+        (selectedProfileNames || []).map(name => cleanName(name).toLowerCase()).filter(Boolean),
+      ),
     [selectedProfileNames],
   );
 
@@ -549,14 +560,14 @@ export function StatisticsView({ initialContext }) {
   );
 
   const byProfileShotSelectionItems = useMemo(
-    () => byProfileEligibleShots.map(shot => buildShotSelectionItem(shot, dateBasisMode)).filter(item => item.id),
+    () =>
+      byProfileEligibleShots
+        .map(shot => buildShotSelectionItem(shot, dateBasisMode))
+        .filter(item => item.id),
     [byProfileEligibleShots, dateBasisMode],
   );
 
-  const selectedShotKeySet = useMemo(
-    () => new Set(selectedShotKeys || []),
-    [selectedShotKeys],
-  );
+  const selectedShotKeySet = useMemo(() => new Set(selectedShotKeys || []), [selectedShotKeys]);
 
   const derivedProfilesFromSelectedShots = useMemo(() => {
     const selectedProfileSet = new Set();
@@ -569,11 +580,18 @@ export function StatisticsView({ initialContext }) {
     return visibleProfileSelectionItems
       .map(item => item.id)
       .filter(profileName => selectedProfileSet.has(profileName));
-  }, [selectionScopeShots, selectedShotKeySet, shotKeyToCanonicalProfile, visibleProfileSelectionItems]);
+  }, [
+    selectionScopeShots,
+    selectedShotKeySet,
+    shotKeyToCanonicalProfile,
+    visibleProfileSelectionItems,
+  ]);
 
   const profileSelectionItems = visibleProfileSelectionItems;
-  const shotSelectionItems = mode === 'profile' ? byProfileShotSelectionItems : baseShotSelectionItems;
-  const displayedProfileSelection = mode === 'shots' ? derivedProfilesFromSelectedShots : selectedProfileNames;
+  const shotSelectionItems =
+    mode === 'profile' ? byProfileShotSelectionItems : baseShotSelectionItems;
+  const displayedProfileSelection =
+    mode === 'shots' ? derivedProfilesFromSelectedShots : selectedProfileNames;
 
   // Stage 2 filtering: apply mode-specific profile/shot selections on top of the base filter.
   const candidateFilterState = useMemo(() => {
@@ -607,7 +625,9 @@ export function StatisticsView({ initialContext }) {
       };
     }
 
-    const selectedProfileSet = new Set(selectedProfileNames.map(name => cleanName(name).toLowerCase()));
+    const selectedProfileSet = new Set(
+      selectedProfileNames.map(name => cleanName(name).toLowerCase()),
+    );
     const selectedShotKeySetLocal = new Set(selectedShotKeys);
 
     const filteredShots = (baseFilterState.filteredShots || []).filter(shot => {
@@ -660,14 +680,15 @@ export function StatisticsView({ initialContext }) {
   }, [candidateFilterState.filteredShots, dateBasisMode, dateFromLocal, dateToLocal]);
 
   // Preserve the original metadata order when rebuilding a selection set.
-  const orderShotSelection = nextSet =>
-    rawShotKeyOrder.filter(key => nextSet.has(key));
+  const orderShotSelection = nextSet => rawShotKeyOrder.filter(key => nextSet.has(key));
 
   const handleProfileSelectionChange = nextProfileNames => {
     const nextProfiles = Array.isArray(nextProfileNames) ? nextProfileNames : [];
     setSelectedProfileNames(nextProfiles);
 
-    const nextProfileSet = new Set(nextProfiles.map(name => cleanName(name).toLowerCase()).filter(Boolean));
+    const nextProfileSet = new Set(
+      nextProfiles.map(name => cleanName(name).toLowerCase()).filter(Boolean),
+    );
     const nextShotKeys =
       nextProfileSet.size === 0
         ? []
@@ -1122,7 +1143,9 @@ export function StatisticsView({ initialContext }) {
 
       {!loading && !result && !error && !metadataError && !metadataLoading && (
         <div className='bg-base-200/50 border-base-content/5 rounded-lg border p-8 text-center'>
-          <p className='text-sm opacity-50'>Configure your filters and press Go to generate statistics.</p>
+          <p className='text-sm opacity-50'>
+            Configure your filters and press Go to generate statistics.
+          </p>
         </div>
       )}
     </div>

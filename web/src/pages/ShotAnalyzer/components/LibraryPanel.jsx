@@ -17,8 +17,20 @@ import { libraryService } from '../services/LibraryService';
 import { indexedDBService } from '../services/IndexedDBService';
 import { notesService } from '../services/NotesService';
 import { ApiServiceContext } from '../../../services/ApiService';
-import { cleanName } from '../utils/analyzerUtils';
+import {
+  ANALYZER_DB_KEYS,
+  cleanName,
+  loadFromStorage,
+  saveToStorage,
+} from '../utils/analyzerUtils';
 import { downloadJson } from '../../../utils/download';
+
+function getStoredLibrarySourceFilter(storageKey) {
+  const storedValue = loadFromStorage(storageKey, 'all');
+  return storedValue === 'gaggimate' || storedValue === 'browser' || storedValue === 'all'
+    ? storedValue
+    : 'all';
+}
 
 export function LibraryPanel({
   currentShot,
@@ -69,8 +81,12 @@ export function LibraryPanel({
   const [profiles, setProfiles] = useState([]);
 
   // Filter & Sort State
-  const [shotsSourceFilter, setShotsSourceFilter] = useState('all');
-  const [profilesSourceFilter, setProfilesSourceFilter] = useState('all');
+  const [shotsSourceFilter, setShotsSourceFilter] = useState(() =>
+    getStoredLibrarySourceFilter(ANALYZER_DB_KEYS.LIBRARY_SHOTS_SOURCE_FILTER),
+  );
+  const [profilesSourceFilter, setProfilesSourceFilter] = useState(() =>
+    getStoredLibrarySourceFilter(ANALYZER_DB_KEYS.LIBRARY_PROFILES_SOURCE_FILTER),
+  );
 
   const [shotsSearch, setShotsSearch] = useState('');
   const [shotsSort, setShotsSort] = useState({ key: 'shotDate', order: 'desc' });
@@ -92,6 +108,14 @@ export function LibraryPanel({
     const timer = setTimeout(() => setDebouncedProfilesSearch(profilesSearch), 250);
     return () => clearTimeout(timer);
   }, [profilesSearch]);
+
+  useEffect(() => {
+    saveToStorage(ANALYZER_DB_KEYS.LIBRARY_SHOTS_SOURCE_FILTER, shotsSourceFilter);
+  }, [shotsSourceFilter]);
+
+  useEffect(() => {
+    saveToStorage(ANALYZER_DB_KEYS.LIBRARY_PROFILES_SOURCE_FILTER, profilesSourceFilter);
+  }, [profilesSourceFilter]);
 
   // Initialize API Service for Library
   useEffect(() => {
@@ -359,8 +383,7 @@ export function LibraryPanel({
         const deleteKey =
           item.source === 'gaggimate' ? item.id : item.storageKey || item.name || item.id;
         await libraryService.deleteShot(deleteKey, item.source);
-      }
-      else {
+      } else {
         const deleteKey =
           item.source === 'gaggimate' ? item.profileId || item.id : item.name || item.label;
         await libraryService.deleteProfile(deleteKey, item.source);
@@ -443,9 +466,7 @@ export function LibraryPanel({
       setCollapsed(true);
       const loadKey =
         item.source === 'gaggimate' ? item.id : item.storageKey || item.name || item.id;
-      const full = item.loaded
-        ? item
-        : await libraryService.loadShot(loadKey, item.source);
+      const full = item.loaded ? item : await libraryService.loadShot(loadKey, item.source);
       await onShotLoad(full, item.name || item.storageKey || item.id);
       if (wasLibraryOpen) {
         onShotLoadedFromLibrary?.();
@@ -484,9 +505,7 @@ export function LibraryPanel({
       <div ref={barRef} style={fixedBarStyle}>
         <div
           className={`bg-base-100/80 border-base-content/10 overflow-hidden border backdrop-blur-md transition-all duration-200 ${
-            !collapsed
-              ? 'rounded-t-xl border-b-0 shadow-none'
-              : 'rounded-xl shadow-lg'
+            !collapsed ? 'rounded-t-xl border-b-0 shadow-none' : 'rounded-xl shadow-lg'
           }`}
         >
           <StatusBar
@@ -566,7 +585,9 @@ export function LibraryPanel({
               </div>
               <div className='grid max-h-[75vh] grid-cols-1 gap-4 overflow-y-auto overscroll-contain p-4 lg:grid-cols-2'>
                 {/* SHOTS SECTION */}
-                <div className={mobileActiveSection === 'shots' ? 'block lg:block' : 'hidden lg:block'}>
+                <div
+                  className={mobileActiveSection === 'shots' ? 'block lg:block' : 'hidden lg:block'}
+                >
                   <LibrarySection
                     title='Shots'
                     items={shots}
@@ -627,7 +648,11 @@ export function LibraryPanel({
                 </div>
 
                 {/* PROFILES SECTION */}
-                <div className={mobileActiveSection === 'profiles' ? 'block lg:block' : 'hidden lg:block'}>
+                <div
+                  className={
+                    mobileActiveSection === 'profiles' ? 'block lg:block' : 'hidden lg:block'
+                  }
+                >
                   <LibrarySection
                     title='Profiles'
                     items={profiles}
@@ -642,7 +667,9 @@ export function LibraryPanel({
                         key: k,
                         order:
                           o ||
-                          (profilesSort.key === k && profilesSort.order === 'desc' ? 'asc' : 'desc'),
+                          (profilesSort.key === k && profilesSort.order === 'desc'
+                            ? 'asc'
+                            : 'desc'),
                       })
                     }
                     onSourceFilterChange={setProfilesSourceFilter}

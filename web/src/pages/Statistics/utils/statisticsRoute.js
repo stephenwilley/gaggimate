@@ -23,12 +23,16 @@ export const STATISTICS_SOURCE_FALLBACK = {
 const INVALID_PROFILE_NAMES = new Set(['no profile loaded']);
 
 export function mapStatisticsSourceAliasToSource(alias) {
-  const normalized = String(alias || '').trim().toLowerCase();
+  const normalized = String(alias || '')
+    .trim()
+    .toLowerCase();
   return SOURCE_ALIAS_TO_SOURCE[normalized] || null;
 }
 
 export function mapSourceToStatisticsAlias(source) {
-  const normalized = String(source || '').trim().toLowerCase();
+  const normalized = String(source || '')
+    .trim()
+    .toLowerCase();
   return SOURCE_TO_ALIAS[normalized] || null;
 }
 
