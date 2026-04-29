@@ -14,6 +14,7 @@ Settings::Settings() {
     grindDelay = preferences.getDouble("del_gd", 1000.0);
     delayAdjust = preferences.getBool("del_ad", true);
     temperatureOffset = preferences.getInt("to", DEFAULT_TEMPERATURE_OFFSET);
+    pressureOffset = preferences.getFloat("poff", DEFAULT_PRESSURE_OFFSET);
     pressureScaling = preferences.getFloat("ps", DEFAULT_PRESSURE_SCALING);
     pid = preferences.getString("pid", DEFAULT_PID);
     pumpModelCoeffs = preferences.getString("pmc", DEFAULT_PUMP_MODEL_COEFFS);
@@ -48,6 +49,7 @@ Settings::Settings() {
     steamPumpCutoff = preferences.getFloat("spc", DEFAULT_STEAM_PUMP_CUTOFF);
     historyIndex = preferences.getInt("hi", 0);
     autowakeupEnabled = preferences.getBool("ab_en", false);
+    developerMode = preferences.getBool("dev_m", false);
 
     // Load schedule format: "time1|days1;time2|days2" where days is 7-bit string (e.g., "1111100" for weekdays only)
     String schedulesStr = preferences.getString("ab_schedules", "");
@@ -135,6 +137,11 @@ void Settings::setTargetWaterTemp(const int target_water_temp) {
 
 void Settings::setTemperatureOffset(const int temperature_offset) {
     temperatureOffset = temperature_offset;
+    save();
+}
+
+void Settings::setPressureOffset(const float pressure_offset) {
+    pressureOffset = pressure_offset;
     save();
 }
 
@@ -416,6 +423,11 @@ void Settings::setAutoWakeupEnabled(bool enabled) {
     save();
 }
 
+void Settings::setDeveloperMode(bool enabled) {
+    developerMode = enabled;
+    save();
+}
+
 void Settings::setAutoWakeupSchedules(const std::vector<AutoWakeupSchedule> &schedules) {
     autowakeupSchedules = schedules;
     save();
@@ -437,6 +449,7 @@ void Settings::doSave() {
     preferences.putDouble("del_gd", grindDelay);
     preferences.putBool("del_ad", delayAdjust);
     preferences.putInt("to", temperatureOffset);
+    preferences.putFloat("poff", pressureOffset);
     preferences.putFloat("ps", pressureScaling);
     preferences.putString("pid", pid);
     preferences.putString("pmc", pumpModelCoeffs);
@@ -471,6 +484,7 @@ void Settings::doSave() {
     preferences.putFloat("spc", steamPumpCutoff);
     preferences.putInt("hi", historyIndex);
     preferences.putBool("ab_en", autowakeupEnabled);
+    preferences.putBool("dev_m", developerMode);
 
     // Save schedule format
     String schedulesForSave = "";
