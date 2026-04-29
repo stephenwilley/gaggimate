@@ -184,6 +184,9 @@ export function Settings() {
       if (key === 'autowakeupEnabled') {
         value = !formData.autowakeupEnabled;
       }
+      if (key === 'developerMode') {
+        value = !formData.developerMode;
+      }
       if (key === 'standbyDisplayEnabled') {
         value = !formData.standbyDisplayEnabled;
         // Set standby brightness to 0 when toggle is off
@@ -490,7 +493,6 @@ export function Settings() {
               checked={!!formData.clock24hFormat}
               onChange={onChange('clock24hFormat')}
             />
-          </Card>
 
           {/* Display Settings */}
           <Card sm={10} lg={5} title='Display Settings'>
@@ -727,6 +729,14 @@ export function Settings() {
                 ))}
               </select>
             </SettingsFormField>
+            <div className='divider'>Developer</div>
+            <ToggleField
+              label='Developer Mode'
+              htmlFor='developerMode'
+              checked={!!formData.developerMode}
+              onChange={onChange('developerMode')}
+              helpText='Enables manual firmware uploads. Use with caution to avoid bricking.'
+            />
           </Card>
 
           {/* Machine Settings */}
@@ -804,6 +814,26 @@ export function Settings() {
                 onChange={onChange('temperatureOffset')}
               />
             </InputGroupField>
+            {pressureAvailable.value && (
+              <InputGroupField
+                label='Pressure Offset (bar)'
+                htmlFor='pressureOffset'
+                unit='bar'
+                unitAriaLabel='bar'
+                helpText='If your machine has a grouphead mushroom valve enter its cracking pressure here. Delonghi machines are often 4.0. If you have a 3-way solenoid valve this should be left at 0.0'
+              >
+                <input
+                  id='pressureOffset'
+                  name='pressureOffset'
+                  type='number'
+                  step='any'
+                  className='grow'
+                  placeholder='0.0'
+                  value={formData.pressureOffset}
+                  onChange={onChange('pressureOffset')}
+                />
+              </InputGroupField>
+            )}
             {pressureAvailable.value && (
               <SettingsFormField
                 label='Pressure Sensor Rating'

@@ -202,10 +202,9 @@ void Controller::setupBluetooth() {
     pluginManager->on("ota:update:end", [this](Event const &) { applyConnectionPriority(true); });
     comms.onSensorData([this](float temp, float pressure, float puckFlow, float pumpFlow, float puckResistance) {
         onTempRead(temp);
-        this->pressure = pressure;
+        onPressureRead(pressure);
         this->currentPuckFlow = puckFlow;
         this->currentPumpFlow = pumpFlow;
-        pluginManager->trigger("boiler:pressure:change", "value", pressure);
         pluginManager->trigger("pump:puck-flow:change", "value", puckFlow);
         pluginManager->trigger("pump:flow:change", "value", pumpFlow);
         pluginManager->trigger("pump:puck-resistance:change", "value", puckResistance);
@@ -405,9 +404,6 @@ void Controller::setupWifi() {
             configTzTime(resolve_timezone(settings.getTimezone()), NTP_SERVER);
             setenv("TZ", resolve_timezone(settings.getTimezone()), 1);
             tzset();
-            sntp_set_sync_mode(SNTP_SYNC_MODE_SMOOTH);
-            sntp_setservername(0, NTP_SERVER);
-            sntp_init();
         } else {
             WiFi.disconnect(true, true);
             ESP_LOGI(LOG_TAG, "Timed out while connecting to WiFi");
@@ -774,7 +770,7 @@ void Controller::updateControl() {
                 const bool pressureTarget = brewProcess->getPumpTarget() == PumpTarget::PUMP_TARGET_PRESSURE;
                 relay.open = brewProcess->isRelayActive();
                 pump.mode = pressureTarget ? PumpControlMode::Pressure : PumpControlMode::Flow;
-                pump.pressure = brewProcess->getPumpPressure();
+                pump.pressure = brewProcess->getPumpPressure() + settings.getPressureOffset();
                 pump.flow = brewProcess->getPumpFlow();
                 targetPressure = brewProcess->getPumpPressure();
                 targetFlow = brewProcess->getPumpFlow();
@@ -936,6 +932,20 @@ void Controller::onTempRead(float temperature) {
     float temp = temperature - static_cast<float>(settings.getTemperatureOffset());
     Event event = pluginManager->trigger("boiler:currentTemperature:change", "value", temp);
     currentTemp = event.getFloat("value");
+}
+
+void Controller::onPressureRead(float pressure) {
+    float p = pressure;
+    if (mode == MODE_BREW) {
+        // Offset for machines with grouphead mushroom valves
+        // Clamped to 0.0 to prevent negative values in the UI
+        p -= settings.getPressureOffset();
+        if (p < 0.0f) {
+            p = 0.0f;
+        }
+    }
+    Event event = pluginManager->trigger("boiler:pressure:change", "value", p);
+    this->pressure = event.getFloat("value");
 }
 
 void Controller::updateLastAction() { lastAction = millis(); }

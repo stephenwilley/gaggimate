@@ -18,6 +18,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <Update.h>
 #include <version.h>
 
 // Incoming WebSocket payloads (profile uploads reserve up to 64 KB) are
@@ -87,7 +88,17 @@ void WebUIPlugin::loop() {
         // firmware over BLE (wants a low-latency link), a display update is over
         // Wi-Fi (wants BLE to stay out of the radio's way). "" = both.
         pluginManager->trigger("ota:update:start", "component", updateComponent);
-        ota->update(updateComponent != "display", updateComponent != "controller");
+        if (updateComponent == "controller:local") {
+            File file = LittleFS.open("/board-firmware.bin", FILE_READ);
+            ota->getControllerOTA().runUpdate(file, file.size());
+            file.close();
+            LittleFS.remove("/board-firmware.bin");
+            ota->setPhase(PHASE_FINISHED);
+            delay(1000);
+            ESP.restart();
+        } else {
+            ota->update(updateComponent != "display", updateComponent != "controller");
+        }
         pluginManager->trigger("ota:update:end");
         updating = false;
     }
@@ -251,6 +262,11 @@ void WebUIPlugin::setupServer() {
         }
     });
     server.on("/api/core-dump", HTTP_GET, [this](AsyncWebServerRequest *request) { handleCoreDumpDownload(request); });
+    server.on(
+        "/api/ota/upload", HTTP_POST, [](AsyncWebServerRequest *request) { request->send(200); },
+        [this](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
+            handleOTAUpload(request, filename, index, data, len, final);
+        });
     server.onNotFound([](AsyncWebServerRequest *request) { request->send(LittleFS, "/w/index.html"); });
     // Content-hashed build assets (Vite emits them under /assets/ with a hash in the filename) never change for a
     // given URL, so let the browser cache them forever and skip the revalidation round-trip entirely. This must be
@@ -543,6 +559,8 @@ void WebUIPlugin::handleSettings(AsyncWebServerRequest *request) const {
                 settings->setTargetWaterTemp(request->arg("targetWaterTemp").toInt());
             if (request->hasArg("temperatureOffset"))
                 settings->setTemperatureOffset(request->arg("temperatureOffset").toInt());
+            if (request->hasArg("pressureOffset"))
+                settings->setPressureOffset(request->arg("pressureOffset").toFloat());
             if (request->hasArg("pressureScaling"))
                 settings->setPressureScaling(request->arg("pressureScaling").toFloat());
             if (request->hasArg("pid"))
@@ -619,6 +637,7 @@ void WebUIPlugin::handleSettings(AsyncWebServerRequest *request) const {
             if (request->hasArg("buttonBehavior"))
                 settings->setButtonBehaviorList(explode(request->arg("buttonBehavior"), ','));
             settings->setAutoWakeupEnabled(request->hasArg("autowakeupEnabled"));
+            settings->setDeveloperMode(request->hasArg("developerMode"));
             if (request->hasArg("autowakeupSchedules")) {
                 // Handle schedule format with days
                 String schedulesStr = request->arg("autowakeupSchedules");
@@ -688,6 +707,7 @@ void WebUIPlugin::handleSettings(AsyncWebServerRequest *request) const {
     doc["wifiPassword"] = apMode ? "---unchanged---" : settings.getWifiPassword();
     doc["mdnsName"] = settings.getMdnsName();
     doc["temperatureOffset"] = String(settings.getTemperatureOffset());
+    doc["pressureOffset"] = String(settings.getPressureOffset());
     doc["pressureScaling"] = String(settings.getPressureScaling());
     doc["boilerFillActive"] = settings.isBoilerFillActive();
     doc["startupFillTime"] = settings.getStartupFillTime() / 1000;
@@ -719,6 +739,7 @@ void WebUIPlugin::handleSettings(AsyncWebServerRequest *request) const {
     // Add auto-wakeup settings to response
     doc["autowakeupEnabled"] = settings.isAutoWakeupEnabled();
     doc["buttonBehavior"] = implode(settings.getButtonBehaviorList(), ",");
+    doc["developerMode"] = settings.isDeveloperMode();
 
     // Add schedule format with days
     std::vector<AutoWakeupSchedule> autowakeupSchedules = settings.getAutoWakeupSchedules();
@@ -803,6 +824,80 @@ void WebUIPlugin::handleBLEScaleInfo(AsyncWebServerRequest *request) {
     request->send(response);
 }
 
+void WebUIPlugin::handleOTAUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len,
+                                 bool final) {
+    if (index == 0) {
+        // Start of upload
+        lastOtaProgress = -1;
+        lastOtaPhase = 0;
+        request->_tempFile = File(); // Reset any previous file
+        if (filename == "display-firmware.bin" || filename == "firmware.bin") {
+            ota->setPhase(PHASE_DISPLAY_FW);
+            if (!Update.begin(UPDATE_SIZE_UNKNOWN, U_FLASH)) {
+                Update.printError(Serial);
+            }
+        } else if (filename == "display-filesystem.bin" || filename == "filesystem.bin") {
+            ota->setPhase(PHASE_DISPLAY_FS);
+            if (!Update.begin(UPDATE_SIZE_UNKNOWN, U_SPIFFS)) {
+                Update.printError(Serial);
+            }
+        } else if (filename == "board-firmware.bin" || filename == "controller.bin") {
+            ota->setPhase(PHASE_CONTROLLER_FW);
+            SPIFFS.remove("/board-firmware.bin");
+            request->_tempFile = SPIFFS.open("/board-firmware.bin", FILE_WRITE);
+        }
+    }
+
+    if (filename == "board-firmware.bin" || filename == "controller.bin") {
+        if (request->_tempFile) {
+            request->_tempFile.write(data, len);
+        }
+    } else {
+        if (Update.write(data, len) != len) {
+            Update.printError(Serial);
+        }
+    }
+
+    // Update progress
+    size_t currentProgress = index + len;
+    size_t totalProgress = request->contentLength();
+    if (totalProgress > 0) {
+        int percentage = (currentProgress * 100) / totalProgress;
+        uint8_t currentPhase = ota->getPhase();
+        int reportedPercentage = percentage;
+
+        // For controller upload, we only use first 50% for upload, next 50% for BLE transfer
+        if (filename == "board-firmware.bin" || filename == "controller.bin") {
+            reportedPercentage = percentage / 2;
+        }
+
+        if (reportedPercentage != lastOtaProgress || currentPhase != lastOtaPhase) {
+            ota->updateProgress(currentPhase, reportedPercentage);
+            lastOtaProgress = reportedPercentage;
+            lastOtaPhase = currentPhase;
+        }
+    }
+
+    if (final) {
+        if (filename == "board-firmware.bin" || filename == "controller.bin") {
+            if (request->_tempFile) {
+                request->_tempFile.close();
+                // Trigger BLE update from loop()
+                updateComponent = "controller:local";
+                updating = true;
+            }
+        } else {
+            if (Update.end(true)) {
+                ota->setPhase(PHASE_FINISHED);
+                delay(1000);
+                ESP.restart();
+            } else {
+                Update.printError(Serial);
+            }
+        }
+    }
+}
+
 void WebUIPlugin::updateOTAStatus(const String &version) {
     if (ws.getClients().empty()) {
         return;
@@ -819,6 +914,7 @@ void WebUIPlugin::updateOTAStatus(const String &version) {
     doc["latestVersion"] = ota->getCurrentVersion();
     doc["channel"] = settings.getOTAChannel();
     doc["updating"] = updating;
+    doc["developerMode"] = settings.isDeveloperMode();
     // LittleFS usage metrics
     {
         size_t total = LittleFS.totalBytes();

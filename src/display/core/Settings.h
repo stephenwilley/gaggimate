@@ -57,6 +57,7 @@ class Settings {
     int getTargetSteamTemp() const { return targetSteamTemp; }
     int getTargetWaterTemp() const { return targetWaterTemp; }
     int getTemperatureOffset() const { return temperatureOffset; }
+    float getPressureOffset() const { return pressureOffset; }
     float getPressureScaling() const { return pressureScaling; }
     double getTargetGrindVolume() const { return targetGrindVolume; }
     int getTargetGrindDuration() const { return targetGrindDuration; }
@@ -119,6 +120,7 @@ class Settings {
     int getFullTankDistance() const { return fullTankDistance; }
     int getAltRelayFunction() const { return altRelayFunction; }
     bool isAutoWakeupEnabled() const { return autowakeupEnabled; }
+    bool isDeveloperMode() const { return developerMode; }
     std::vector<AutoWakeupSchedule> getAutoWakeupSchedules() const { return autowakeupSchedules; }
     String getButtonBehavior(int index) const {
         if (index >= 0 && index < buttonBehavior.size())
@@ -129,6 +131,7 @@ class Settings {
     void setTargetSteamTemp(int target_steam_temp);
     void setTargetWaterTemp(int target_water_temp);
     void setTemperatureOffset(int temperature_offset);
+    void setPressureOffset(float pressure_offset);
     void setPressureScaling(float pressure_scaling);
     void setTargetGrindVolume(double target_grind_volume);
     void setTargetGrindDuration(int target_duration);
@@ -192,6 +195,7 @@ class Settings {
     void setFullTankDistance(int full_tank_distance);
     void setAltRelayFunction(int alt_relay_function);
     void setAutoWakeupEnabled(bool enabled);
+    void setDeveloperMode(bool enabled);
     void setAutoWakeupSchedules(const std::vector<AutoWakeupSchedule> &schedules);
     void setButtonBehavior(int index, String behavior);
     void setButtonBehaviorList(const std::vector<String> &behavior_list);
@@ -205,6 +209,7 @@ class Settings {
     int targetSteamTemp = 155;
     int targetWaterTemp = 80;
     int temperatureOffset = DEFAULT_TEMPERATURE_OFFSET;
+    float pressureOffset = DEFAULT_PRESSURE_OFFSET;
     float pressureScaling = DEFAULT_PRESSURE_SCALING;
     double targetGrindVolume = 18;
     int targetGrindDuration = 25000;
@@ -267,6 +272,7 @@ class Settings {
     int fullTankDistance = 50;
     int altRelayFunction = ALT_RELAY_GRIND; // Default to grind
     std::vector<String> buttonBehavior;
+    bool developerMode = false;
 
     void doSave();
     xTaskHandle taskHandle;
