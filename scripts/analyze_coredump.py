@@ -216,22 +216,34 @@ def main():
         print("  python3 scripts/analyze_coredump.py ~/Downloads/coredump.bin display /path/to/firmware.elf")
         sys.exit(1)
     
-    support_file = sys.argv[1]
+    input_file = sys.argv[1]
     support_data = {
         'versions': {
             'displayVersion': 'unknown'
         }
     }
 
-    coredump_file = "coredump.bin"
-    with open(support_file, 'r') as f:
-        support_data = json.load(f)
-        coredump = support_data['coredump']
+    # Detect whether the input is a JSON "support file" (web UI export) or
+    # a raw coredump.bin streamed directly from the device's /api/coredump endpoint.
+    with open(input_file, 'rb') as f:
+        head = f.read(4)
+
+    is_support_json = head[:1] == b'{'
+
+    if is_support_json:
+        coredump_file = "coredump.bin"
+        with open(input_file, 'r') as f:
+            support_data = json.load(f)
+        coredump = support_data.get('coredump')
+        if not coredump:
+            print("❌ Support file does not contain a 'coredump' field")
+            sys.exit(1)
         coredump_binary = base64.b64decode(coredump)
         with open(coredump_file, 'wb') as f2:
             f2.write(coredump_binary)
-
-
+    else:
+        # Raw coredump.bin downloaded from /api/coredump — use it directly.
+        coredump_file = input_file
 
     # Parse arguments - support both environment and direct ELF file specification
     environment = "display"  # default
@@ -254,7 +266,7 @@ def main():
     if 'displayVersion' in support_data['versions']:
         displayVersion = support_data['versions']['displayVersion']
     print(f"Version: {displayVersion}")
-    print(f"Support file: {support_file}")
+    print(f"Input file: {input_file}")
     print(f"Core dump: {coredump_file}")
     if custom_elf_file:
         print(f"ELF file: {custom_elf_file}")
