@@ -151,8 +151,27 @@ void BLEScalePlugin::update() {
         return;
 
     if (scale != nullptr) {
-        // Call scale update with error checking
-        scale->update();
+        // Call scale update with error checking. Catch any allocation/runtime
+        // failures from the BLE scales lib so a hiccup inside the driver
+        // doesn't take down the whole device — disconnect and let the scan
+        // path try again.
+        try {
+            scale->update();
+        } catch (const std::exception &e) {
+            ESP_LOGE("BLEScalePlugin", "scale->update() threw: %s — disconnecting", e.what());
+            disconnect();
+            if (scanner != nullptr) {
+                scanner->initializeAsyncScan();
+            }
+            return;
+        } catch (...) {
+            ESP_LOGE("BLEScalePlugin", "scale->update() threw unknown exception — disconnecting");
+            disconnect();
+            if (scanner != nullptr) {
+                scanner->initializeAsyncScan();
+            }
+            return;
+        }
         if (!hasConnectedScale) {
             reconnectionTries++;
             if (reconnectionTries > RECONNECTION_TRIES) {
@@ -312,7 +331,14 @@ void BLEScalePlugin::establishConnection() {
                 }
             });
 
-            bool connectResult = scale->connect();
+            bool connectResult = false;
+            try {
+                connectResult = scale->connect();
+            } catch (const std::exception &e) {
+                ESP_LOGE("BLEScalePlugin", "scale->connect() threw: %s", e.what());
+            } catch (...) {
+                ESP_LOGE("BLEScalePlugin", "scale->connect() threw unknown exception");
+            }
             if (!connectResult) {
                 ESP_LOGW("BLEScalePlugin", "Failed to connect to scale, retrying scan");
                 disconnect();
