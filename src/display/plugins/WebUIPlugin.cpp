@@ -843,8 +843,8 @@ void WebUIPlugin::handleOTAUpload(AsyncWebServerRequest *request, String filenam
             }
         } else if (filename == "board-firmware.bin" || filename == "controller.bin") {
             ota->setPhase(PHASE_CONTROLLER_FW);
-            SPIFFS.remove("/board-firmware.bin");
-            request->_tempFile = SPIFFS.open("/board-firmware.bin", FILE_WRITE);
+            LittleFS.remove("/board-firmware.bin");
+            request->_tempFile = LittleFS.open("/board-firmware.bin", FILE_WRITE);
         }
     }
 

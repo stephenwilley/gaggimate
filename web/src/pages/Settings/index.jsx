@@ -493,6 +493,7 @@ export function Settings() {
               checked={!!formData.clock24hFormat}
               onChange={onChange('clock24hFormat')}
             />
+          </Card>
 
           {/* Display Settings */}
           <Card sm={10} lg={5} title='Display Settings'>
