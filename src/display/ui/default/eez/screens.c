@@ -6020,6 +6020,10 @@ void create_user_widget_dials(lv_obj_t *parent_obj, void *flowState, int startWi
             lv_obj_set_style_img_recolor(obj, lv_color_hex(theme_colors[eez_flow_get_selected_theme_index()][2]),
                                          LV_PART_MAIN | LV_STATE_CHECKED);
             lv_obj_set_style_img_opa(obj, 125, LV_PART_MAIN | LV_STATE_DISABLED);
+            lv_obj_set_style_img_recolor(obj, lv_color_hex(theme_colors[eez_flow_get_selected_theme_index()][8]),
+                                         LV_PART_MAIN | LV_STATE_USER_1);
+            lv_obj_set_style_img_recolor(obj, lv_color_hex(theme_colors[eez_flow_get_selected_theme_index()][0]),
+                                         LV_PART_MAIN | LV_STATE_USER_2);
         }
         {
             // pressureIcon
@@ -6901,6 +6905,12 @@ void change_color_theme(uint32_t theme_index) {
                 if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
                     lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
                                                  lv_color_hex(theme_colors[theme_index][2]), LV_PART_MAIN | LV_STATE_CHECKED);
+                if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
+                    lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
+                                                 lv_color_hex(theme_colors[theme_index][8]), LV_PART_MAIN | LV_STATE_USER_1);
+                if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
+                    lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
+                                                 lv_color_hex(theme_colors[theme_index][0]), LV_PART_MAIN | LV_STATE_USER_2);
                 if (((lv_obj_t **)&objects)[startWidgetIndex + 6])
                     lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 6],
                                                  lv_color_hex(theme_colors[theme_index][7]), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -7028,6 +7038,12 @@ void change_color_theme(uint32_t theme_index) {
                 if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
                     lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
                                                  lv_color_hex(theme_colors[theme_index][2]), LV_PART_MAIN | LV_STATE_CHECKED);
+                if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
+                    lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
+                                                 lv_color_hex(theme_colors[theme_index][8]), LV_PART_MAIN | LV_STATE_USER_1);
+                if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
+                    lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
+                                                 lv_color_hex(theme_colors[theme_index][0]), LV_PART_MAIN | LV_STATE_USER_2);
                 if (((lv_obj_t **)&objects)[startWidgetIndex + 6])
                     lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 6],
                                                  lv_color_hex(theme_colors[theme_index][7]), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -7123,6 +7139,12 @@ void change_color_theme(uint32_t theme_index) {
                 if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
                     lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
                                                  lv_color_hex(theme_colors[theme_index][2]), LV_PART_MAIN | LV_STATE_CHECKED);
+                if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
+                    lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
+                                                 lv_color_hex(theme_colors[theme_index][8]), LV_PART_MAIN | LV_STATE_USER_1);
+                if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
+                    lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
+                                                 lv_color_hex(theme_colors[theme_index][0]), LV_PART_MAIN | LV_STATE_USER_2);
                 if (((lv_obj_t **)&objects)[startWidgetIndex + 6])
                     lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 6],
                                                  lv_color_hex(theme_colors[theme_index][7]), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -7236,6 +7258,12 @@ void change_color_theme(uint32_t theme_index) {
                 if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
                     lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
                                                  lv_color_hex(theme_colors[theme_index][2]), LV_PART_MAIN | LV_STATE_CHECKED);
+                if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
+                    lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
+                                                 lv_color_hex(theme_colors[theme_index][8]), LV_PART_MAIN | LV_STATE_USER_1);
+                if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
+                    lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
+                                                 lv_color_hex(theme_colors[theme_index][0]), LV_PART_MAIN | LV_STATE_USER_2);
                 if (((lv_obj_t **)&objects)[startWidgetIndex + 6])
                     lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 6],
                                                  lv_color_hex(theme_colors[theme_index][7]), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -7307,6 +7335,12 @@ void change_color_theme(uint32_t theme_index) {
                 if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
                     lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
                                                  lv_color_hex(theme_colors[theme_index][2]), LV_PART_MAIN | LV_STATE_CHECKED);
+                if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
+                    lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
+                                                 lv_color_hex(theme_colors[theme_index][8]), LV_PART_MAIN | LV_STATE_USER_1);
+                if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
+                    lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
+                                                 lv_color_hex(theme_colors[theme_index][0]), LV_PART_MAIN | LV_STATE_USER_2);
                 if (((lv_obj_t **)&objects)[startWidgetIndex + 6])
                     lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 6],
                                                  lv_color_hex(theme_colors[theme_index][7]), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -7413,6 +7447,12 @@ void change_color_theme(uint32_t theme_index) {
                 if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
                     lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
                                                  lv_color_hex(theme_colors[theme_index][2]), LV_PART_MAIN | LV_STATE_CHECKED);
+                if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
+                    lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
+                                                 lv_color_hex(theme_colors[theme_index][8]), LV_PART_MAIN | LV_STATE_USER_1);
+                if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
+                    lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
+                                                 lv_color_hex(theme_colors[theme_index][0]), LV_PART_MAIN | LV_STATE_USER_2);
                 if (((lv_obj_t **)&objects)[startWidgetIndex + 6])
                     lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 6],
                                                  lv_color_hex(theme_colors[theme_index][7]), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -7514,6 +7554,12 @@ void change_color_theme(uint32_t theme_index) {
                 if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
                     lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
                                                  lv_color_hex(theme_colors[theme_index][2]), LV_PART_MAIN | LV_STATE_CHECKED);
+                if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
+                    lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
+                                                 lv_color_hex(theme_colors[theme_index][8]), LV_PART_MAIN | LV_STATE_USER_1);
+                if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
+                    lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
+                                                 lv_color_hex(theme_colors[theme_index][0]), LV_PART_MAIN | LV_STATE_USER_2);
                 if (((lv_obj_t **)&objects)[startWidgetIndex + 6])
                     lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 6],
                                                  lv_color_hex(theme_colors[theme_index][7]), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -7624,6 +7670,12 @@ void change_color_theme(uint32_t theme_index) {
                 if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
                     lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
                                                  lv_color_hex(theme_colors[theme_index][2]), LV_PART_MAIN | LV_STATE_CHECKED);
+                if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
+                    lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
+                                                 lv_color_hex(theme_colors[theme_index][8]), LV_PART_MAIN | LV_STATE_USER_1);
+                if (((lv_obj_t **)&objects)[startWidgetIndex + 5])
+                    lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 5],
+                                                 lv_color_hex(theme_colors[theme_index][0]), LV_PART_MAIN | LV_STATE_USER_2);
                 if (((lv_obj_t **)&objects)[startWidgetIndex + 6])
                     lv_obj_set_style_img_recolor(((lv_obj_t **)&objects)[startWidgetIndex + 6],
                                                  lv_color_hex(theme_colors[theme_index][7]), LV_PART_MAIN | LV_STATE_DEFAULT);
