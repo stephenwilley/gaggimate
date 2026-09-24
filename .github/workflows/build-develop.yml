@@ -1,0 +1,73 @@
+# Personal build: every push to develop is built and published as the
+# "nightly" release on this fork. The display's updater (RELEASE_URL points
+# here, channel "nightly") reads releases/download/nightly/version.txt and
+# pulls display-firmware.bin + board-firmware.bin from the same release.
+on:
+  push:
+    branches:
+      - "develop"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-develop
+  cancel-in-progress: true
+
+name: Build Develop
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: 'recursive'
+      # The fork carries no tags; take upstream's so git describe matches a local build.
+      - name: Fetch upstream tags
+        run: git fetch --no-recurse-submodules https://github.com/jniebuhr/gaggimate.git 'refs/tags/v*:refs/tags/v*'
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: web/package-lock.json
+      - name: Version
+        run: |
+          mkdir -p out
+          git describe --tags --exclude nightly --exclude db > out/version.txt
+          cat out/version.txt
+      - name: Build web UI
+        run: ./scripts/build_webui.sh
+      - name: Build controller
+        run: |
+          pio run -e controller
+          cp .pio/build/controller/firmware.bin out/board-firmware.bin
+      - name: Build display
+        run: |
+          pio run -e display
+          cp .pio/build/display/firmware.bin out/display-firmware.bin
+      - name: Publish nightly release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="$(cat out/version.txt)"
+          git tag -f nightly
+          git push -f origin refs/tags/nightly
+          if ! gh release view nightly >/dev/null 2>&1; then
+            gh release create nightly --prerelease --title "Develop ${VERSION}" --notes "Personal develop build."
+          fi
+          gh release edit nightly --title "Develop ${VERSION}" --notes "Personal develop build ${VERSION} (${GITHUB_SHA})."
+          gh release upload nightly out/* --clobber
