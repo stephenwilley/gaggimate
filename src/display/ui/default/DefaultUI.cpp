@@ -27,6 +27,8 @@ static constexpr int32_t GAUGE_TICK_LONG = 25;      // meter tick length on most
 static constexpr int32_t GAUGE_TICK_SHORT = 10;     // shortened tick length on profile / new-menu screens
 static constexpr uint32_t GAUGE_TICK_ANIM_MS = 300; // tick length transition duration
 
+static constexpr int TEMP_ICON_HOT_THRESHOLD = 40; // above target and at least this hot: amber (still cooling)
+
 // Profile and the new menu screen show shortened meter ticks.
 static bool isShortTickScreen(ScreensEnum s) {
     return s == SCREEN_ID_PROFILE_SCREEN || s == SCREEN_ID_MENU_SCREEN_NEW || s == SCREEN_ID_INFO_SCREEN;
@@ -257,6 +259,7 @@ void DefaultUI::loop() {
         eez::flow::setGlobalVariable(FLOW_GLOBAL_VARIABLE_GRIND_WEIGHT_TARGET, grindWeightTarget);
 
         handleScreenChange();
+        updateTempIcons();
         currentScreen = static_cast<ScreensEnum>(eez_flow_get_current_screen());
         effect_mgr.evaluate_all();
 
@@ -525,13 +528,31 @@ void DefaultUI::updateState() {
     uiFlags.active(controller->isActive());
     uiFlags.grind_active(controller->isGrindActive());
     uiFlags.grind_volumetric(controller->isVolumetricAvailable() && settings.isVolumetricTarget());
-    uiFlags.heating_flash(heatingFlash);
+    // Only pulse the thermometer while actually heating up to target.
+    uiFlags.heating_flash(heatingFlash && currentTemp < targetTemp);
     uiFlags.temperature_stable(controller->getWarnings().isTemperatureStable());
     uiFlags.has_prev_profile(currentProfileIdx > 0);
     uiFlags.brew_confirm_visible(brewConfirmVisible);
     {
         std::lock_guard<std::mutex> guard(profilesMutex);
         uiFlags.has_next_profile(currentProfileIdx + 1 < static_cast<int>(favoritedProfileIds.size()));
+    }
+}
+
+// Thermometer colour: green when stable (CHECKED, from the flow), red and pulsing while heating (DEFAULT),
+// amber when above target but still hot (USER_1), theme foreground when cold / off (USER_2).
+void DefaultUI::updateTempIcons() {
+    const bool resting = !controller->getWarnings().isTemperatureStable() && currentTemp >= targetTemp;
+    const bool hot = resting && currentTemp >= TEMP_ICON_HOT_THRESHOLD;
+    const bool cold = resting && !hot;
+    lv_obj_t *icons[] = {objects.brew_dials__temp_icon,  objects.status_dials__temp_icon, objects.new_menu_dials__temp_icon,
+                         objects.steam_dials__temp_icon, objects.water_dials__temp_icon,  objects.profile_dials__temp_icon,
+                         objects.grind_dials__temp_icon, objects.obj2__temp_icon};
+    for (lv_obj_t *icon : icons) {
+        if (icon == nullptr)
+            continue;
+        hot ? lv_obj_add_state(icon, LV_STATE_USER_1) : lv_obj_clear_state(icon, LV_STATE_USER_1);
+        cold ? lv_obj_add_state(icon, LV_STATE_USER_2) : lv_obj_clear_state(icon, LV_STATE_USER_2);
     }
 }
 

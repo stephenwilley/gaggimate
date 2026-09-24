@@ -13870,6 +13870,12 @@
                 },
                 "DISABLED": {
                   "img_opa": 125
+                },
+                "USER_1": {
+                  "img_recolor": "Warning"
+                },
+                "USER_2": {
+                  "img_recolor": "NiceWhite"
                 }
               }
             }

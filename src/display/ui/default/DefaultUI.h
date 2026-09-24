@@ -81,6 +81,7 @@ class DefaultUI {
     void positionMenuIcon(lv_obj_t *obj, int angle, int radius);
 
     void updateState();
+    void updateTempIcons();
     void updateSystemStatus();
     void updateWarnings();
     void updateProfileInfo();
