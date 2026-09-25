@@ -3,17 +3,20 @@
 
 The EEZ UI draws img_logo as LV_IMG_CF_ALPHA_8BIT recoloured to NiceWhite, so
 only alpha carries the picture. Dark source pixels become opaque (shown white),
-light/transparent ones become transparent.
+light/transparent ones become transparent. --gamma below 1 lifts the
+partially-covered pixels (fine hatching reads grey on the small screen)
+while leaving solid lines and the background alone; alpha under 8 is dropped
+so the lift doesn't turn paper texture into haze.
 
 Writes both the C array the firmware compiles and the black+alpha PNG embedded
 in eez-ui/gaggimate.eez-project, so regenerating from EEZ Studio keeps the logo.
 
-    python3 scripts/logo_to_eez.py icons/stephen_logo.png
+    python3 scripts/logo_to_eez.py icons/stephen_logo.png --gamma 0.5
 """
+import argparse
 import base64
 import io
 import json
-import sys
 from pathlib import Path
 
 from PIL import Image
@@ -23,7 +26,7 @@ C_FILE = ROOT / "src/display/ui/default/eez/images/ui_image_logo.c"
 PROJECT = ROOT / "eez-ui/gaggimate.eez-project"
 
 
-def main(src: str) -> None:
+def main(src: str, gamma: float) -> None:
     im = Image.open(src).convert("RGBA")
     w, h = im.size
     px = im.tobytes()
@@ -31,6 +34,8 @@ def main(src: str) -> None:
         a * (255 - (r * 299 + g * 587 + b * 114) // 1000) // 255
         for r, g, b, a in zip(px[0::4], px[1::4], px[2::4], px[3::4])
     )
+    if gamma != 1.0:
+        alpha = bytes(0 if v < 8 else round(255 * (v / 255) ** gamma) for v in alpha)
 
     # C array: keep upstream's preamble, replace the data and the descriptor.
     text = C_FILE.read_text()
@@ -65,8 +70,12 @@ def main(src: str) -> None:
     project = json.loads(raw)
     old = next(b["image"] for b in project["bitmaps"] if b["name"] == "logo")
     PROJECT.write_text(raw.replace(old, uri, 1))
-    print(f"logo {w}x{h} -> {C_FILE.relative_to(ROOT)}, {PROJECT.relative_to(ROOT)}")
+    print(f"logo {w}x{h} gamma {gamma} -> {C_FILE.relative_to(ROOT)}, {PROJECT.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("src")
+    ap.add_argument("--gamma", type=float, default=1.0, help="alpha gamma; <1 brightens partial pixels")
+    args = ap.parse_args()
+    main(args.src, args.gamma)
