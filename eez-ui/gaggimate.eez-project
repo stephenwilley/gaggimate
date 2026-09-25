@@ -1139,7 +1139,7 @@
               "type": "LVGLLabelWidget",
               "left": 0,
               "top": -150,
-              "width": 150,
+              "width": 200,
               "height": 38,
               "customInputs": [],
               "customOutputs": [],

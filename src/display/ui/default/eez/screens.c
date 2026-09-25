@@ -1154,7 +1154,7 @@ void create_screen_standby_screen() {
             lv_obj_t *obj = lv_label_create(parent_obj);
             objects.time = obj;
             lv_obj_set_pos(obj, 0, -150);
-            lv_obj_set_size(obj, 150, LV_SIZE_CONTENT);
+            lv_obj_set_size(obj, 200, LV_SIZE_CONTENT);
             lv_obj_set_style_text_color(obj, lv_color_hex(theme_colors[eez_flow_get_selected_theme_index()][0]),
                                         LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_font(obj, &lv_font_montserrat_34, LV_PART_MAIN | LV_STATE_DEFAULT);
